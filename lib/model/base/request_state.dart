@@ -1,21 +1,24 @@
-import 'package:fluvie/model/base/api_error.dart';
+import 'package:fluvie/model/base/result.dart';
 
 abstract class RequestState {}
 
 class InitialState extends RequestState {}
 
 class SuccessState<T> extends RequestState {
-  final T _data;
-  T get data => _data;
-  SuccessState(this._data);
+  final T data;
+  SuccessState(this.data);
 }
 
 class ErrorState extends RequestState {
-  final ApiError error;
-  ErrorState(this.error);
+  int code;
+  String message;
+
+  ErrorState(this.code, this.message);
+
+  factory ErrorState.fromResult(Result result) {
+    var failure = result as Failure;
+    return ErrorState(failure.code, failure.message);
+  }
 }
 
-class LoadingState extends RequestState {
-  bool isLoading = false;
-  LoadingState(this.isLoading);
-}
+class LoadingState extends RequestState {}

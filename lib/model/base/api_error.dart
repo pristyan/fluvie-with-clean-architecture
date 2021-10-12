@@ -11,17 +11,19 @@ class ApiError {
   ApiError({this.statusCode, this.statusMessage});
 
   factory ApiError.fromDio(DioError e) {
-    if (e.type == DioErrorType.other) {
-        return ApiError._noConnection();
-      } else if (e.type == DioErrorType.connectTimeout || e.type == DioErrorType.sendTimeout) {
+    switch (e.type) {
+      case DioErrorType.connectTimeout:
+      case DioErrorType.sendTimeout:
         return ApiError._connectionTimeOut();
-      } else if (e.type == DioErrorType.receiveTimeout) {
+      case DioErrorType.receiveTimeout:
         return ApiError._receiveTimeOut();
-      } else if (e.response?.data != null) {
+      case DioErrorType.response:
         return ApiError.fromJson(e.response?.data);
-      } else {
-        return ApiError._unknown(e);
-      }
+      case DioErrorType.other:
+        return ApiError._noConnection();
+      default:
+        return ApiError.general();
+    }
   }
 
   factory ApiError.general() {
@@ -44,18 +46,11 @@ class ApiError {
       statusMessage: 'Make sure you have a proper internet connection.',
     );
   }
-  
+
   factory ApiError._receiveTimeOut() {
     return ApiError(
       statusCode: -3,
       statusMessage: 'Oops, our server is busy. Please try again later.',
-    );
-  }
-
-  factory ApiError._unknown(DioError e) {
-    return ApiError(
-      statusCode: -4,
-      statusMessage: e.toString(),
     );
   }
 

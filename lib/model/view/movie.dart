@@ -1,3 +1,4 @@
+import 'package:fluvie/constant/api_constant.dart';
 import 'package:fluvie/model/view/genre.dart';
 import 'package:fluvie/model/view/production_company.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -41,4 +42,7 @@ class Movie {
   factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
   Map<String, dynamic> toJson() => _$MovieToJson(this);
 
+  String get fullImageUrl {
+    return ApiConstant.imageBaseUrl + (posterPath ?? '');
+  }
 }
