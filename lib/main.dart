@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluvie/factory/core_factory.dart';
 import 'package:fluvie/presentation/moviedetail/movie_detail_screen.dart';
 
 void main() {
@@ -10,12 +11,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MovieDetailScreen(),
+    return FutureBuilder<bool>(
+      future: CoreFactory.initializeDatabase(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: const MovieDetailScreen(),
+          );
+        } else {
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.white,
+          );
+        }
+      },
     );
   }
 }

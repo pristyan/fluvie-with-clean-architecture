@@ -7,7 +7,7 @@ import 'package:fluvie/factory/core_factory.dart';
 class DataSourceFactory {
 
   static MovieLocalDataSource getMovieLocalDataSource() {
-    return MovieLocalDataSourceImpl();
+    return MovieLocalDataSourceImpl(appDatabase: CoreFactory.getAppDatabase());
   }
 
   static MovieRemoteDataSource getMovieRemoteDataSource() {

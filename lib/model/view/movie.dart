@@ -1,4 +1,5 @@
 import 'package:fluvie/constant/api_constant.dart';
+import 'package:fluvie/model/db/movie_entity.dart';
 import 'package:fluvie/model/view/genre.dart';
 import 'package:fluvie/model/view/production_company.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -44,5 +45,15 @@ class Movie {
 
   String get fullImageUrl {
     return ApiConstant.imageBaseUrl + (posterPath ?? '');
+  }
+
+  factory Movie.fromEntity(MovieEntity entity) {
+    return Movie(
+      id: entity.id,
+      title: entity.title,
+      overview: entity.overview,
+      voteAverage: entity.voteAverage,
+      posterPath: entity.posterPath,
+    );
   }
 }

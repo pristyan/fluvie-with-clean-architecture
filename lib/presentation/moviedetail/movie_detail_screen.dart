@@ -48,91 +48,108 @@ class MovieDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPosterAndFavorite(BuildContext context, RequestState state) {
-    return AspectRatio(
-      aspectRatio: 3 / 5,
-      child: Stack(
+  Widget _buildPosterBasedOnState(RequestState state) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      margin: const EdgeInsets.only(bottom: Dimens.spacingXLarge),
+      clipBehavior: Clip.antiAlias,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(56.0),
+          bottomRight: Radius.circular(56.0),
+        ),
+      ),
+      child: Builder(
+        builder: (context) {
+          if (state is SuccessState<Movie>) {
+            return FadeInImage.assetNetwork(
+              image: state.data.fullImageUrl,
+              placeholder: LocalImagesPath.squarePlaceholder,
+              fit: BoxFit.cover,
+            );
+          } else {
+            return Image.asset(
+              LocalImagesPath.squarePlaceholder,
+              fit: BoxFit.cover,
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildButtonsOnPoster(Movie movie) {
+    return Positioned(
+      bottom: 0.0,
+      left: 0.0,
+      right: 0.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            margin: const EdgeInsets.only(bottom: Dimens.spacingXLarge),
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(56.0),
-              bottomRight: Radius.circular(56.0),
-            )),
-            child: Builder(
-              builder: (context) {
-                if (state is SuccessState<Movie>) {
-                  return FadeInImage.assetNetwork(
-                    image: state.data.fullImageUrl,
-                    placeholder: LocalImagesPath.squarePlaceholder,
-                    fit: BoxFit.cover,
-                  );
-                } else {
-                  return Image.asset(
-                    LocalImagesPath.squarePlaceholder,
-                    fit: BoxFit.cover,
-                  );
-                }
-              },
+          FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: Colors.white,
+            elevation: Dimens.fabElevation,
+            child: const Icon(
+              Icons.share_rounded,
+              color: Colors.black,
             ),
           ),
-          Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FloatingActionButton(
-                  onPressed: () {},
-                  backgroundColor: Colors.white,
-                  elevation: Dimens.fabElevation,
-                  child: const Icon(
-                    Icons.share_rounded,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(width: Dimens.spacingMedium),
-                SizedBox(
-                  width: Dimens.fabLarge,
-                  height: Dimens.fabLarge,
-                  child: RawMaterialButton(
-                    onPressed: () {},
-                    fillColor: Colors.blue,
-                    elevation: Dimens.fabElevation,
-                    shape: const CircleBorder(),
-                    child: const Icon(
-                      Icons.play_arrow_rounded,
-                      color: Colors.white,
-                      size: Dimens.iconLarge,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: Dimens.spacingMedium),
-                BlocBuilder<MovieDetailFavoriteBloc, bool>(
-                  builder: (context, isFavorite) {
-                    return FloatingActionButton(
-                      onPressed: context
-                          .read<MovieDetailFavoriteBloc>()
-                          .toggleFavorite,
-                      backgroundColor: Colors.white,
-                      elevation: Dimens.fabElevation,
-                      child: Icon(
-                        Icons.favorite,
-                        color: isFavorite ? Colors.red[400] : Colors.grey[500],
-                      ),
-                    );
-                  },
-                ),
-              ],
+          const SizedBox(width: Dimens.spacingMedium),
+          SizedBox(
+            width: Dimens.fabLarge,
+            height: Dimens.fabLarge,
+            child: RawMaterialButton(
+              onPressed: () {},
+              fillColor: Colors.blue,
+              elevation: Dimens.fabElevation,
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: Dimens.iconLarge,
+              ),
             ),
+          ),
+          const SizedBox(width: Dimens.spacingMedium),
+          BlocBuilder<MovieDetailFavoriteBloc, bool>(
+            builder: (context, isFavorite) {
+              return FloatingActionButton(
+                onPressed: () => context
+                    .read<MovieDetailFavoriteBloc>()
+                    .toggleFavorite(movie),
+                backgroundColor: Colors.white,
+                elevation: Dimens.fabElevation,
+                child: Icon(
+                  Icons.favorite,
+                  color: isFavorite ? Colors.red[400] : Colors.grey[500],
+                ),
+              );
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, RequestState state) {
+    return AspectRatio(
+      aspectRatio: 3 / 5,
+      child: Builder(
+        builder: (context) {
+          if (state is SuccessState<Movie>) {
+            return Stack(
+              children: [
+                _buildPosterBasedOnState(state),
+                _buildButtonsOnPoster(state.data),
+              ],
+            );
+          } else {
+            return _buildPosterBasedOnState(state);
+          }
+        },
       ),
     );
   }
@@ -164,9 +181,9 @@ class MovieDetailScreen extends StatelessWidget {
       return Container(
         margin: const EdgeInsets.only(
           right: Dimens.spacingLarge,
-            left: Dimens.spacingLarge,
-            top: Dimens.spacingMedium,
-            bottom: Dimens.spacingNormal,
+          left: Dimens.spacingLarge,
+          top: Dimens.spacingMedium,
+          bottom: Dimens.spacingNormal,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,6 +266,10 @@ class MovieDetailScreen extends StatelessWidget {
           if (state is ErrorState) {
             ErrorMessageSnackbar.show(context, state.message);
           }
+
+          if (state is SuccessState<Movie>) {
+            context.read<MovieDetailFavoriteBloc>().checkFavorite(state.data);
+          }
         },
         builder: (context, state) {
           return Scaffold(
@@ -261,7 +282,7 @@ class MovieDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        _buildPosterAndFavorite(context, state),
+                        _buildHeader(context, state),
                         _buildTitleAndSummary(state),
                       ],
                     ),
