@@ -1,3 +1,4 @@
+import 'package:fluvie/constant/api_constant.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'production_company.g.dart';
@@ -18,4 +19,12 @@ class ProductionCompany {
 
   factory ProductionCompany.fromJson(Map<String, dynamic> json) => _$ProductionCompanyFromJson(json);
   Map<String, dynamic> toJson() => _$ProductionCompanyToJson(this);
+
+  String? get fullLogoPath {
+    if (logoPath == null) {
+      return null;
+    } else {
+      return ApiConstant.imageBaseUrl + (logoPath ?? '');
+    }
+  }
 }

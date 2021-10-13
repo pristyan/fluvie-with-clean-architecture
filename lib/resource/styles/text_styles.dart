@@ -9,8 +9,8 @@ class TextStyles {
   );
 
   static const TextStyle contentTitle = TextStyle(
-    fontSize: Dimens.textMedium,
-    fontWeight: FontWeight.w500,
+    fontSize: Dimens.textNormal,
+    fontWeight: FontWeight.w600,
     color: Colors.black,
   );
 
@@ -19,10 +19,23 @@ class TextStyles {
     fontWeight: FontWeight.normal,
     color: Colors.black,
   );
+  
+  static const TextStyle paragraph = TextStyle(
+    fontSize: Dimens.textNormal,
+    fontWeight: FontWeight.normal,
+    color: Colors.black,
+  );
 
   static const TextStyle caption = TextStyle(
     fontSize: Dimens.textSmall,
     fontWeight: FontWeight.normal,
-    color: Colors.black,
+    color: Colors.grey,
+  );
+
+  static const TextStyle sectionHeader = TextStyle(
+    fontSize: Dimens.textSmall,
+    fontWeight: FontWeight.w700,
+    color: Colors.grey,
+    fontStyle: FontStyle.italic,
   );
 }

@@ -16,7 +16,7 @@ class MovieDetailBloc extends Cubit<RequestState> {
 
   Future<void> getDetail() async {
     emit(LoadingState());
-    var result = await _movieRepository.getMovieDetail('580489');
+    var result = await _movieRepository.getMovieDetail('550988');
     if (result is Success) {
       emit(SuccessState<Movie>(result.data));
     } else {

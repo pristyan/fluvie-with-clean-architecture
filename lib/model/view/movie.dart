@@ -20,6 +20,7 @@ class Movie {
   final String? originalTitle;
   final double? popularity;
   final String? releaseDate;
+  final String? tagline;
   final List<Genre>? genres;
   final List<ProductionCompany>? productionCompanies;
 
@@ -36,6 +37,7 @@ class Movie {
     this.originalTitle,
     this.popularity,
     this.releaseDate,
+    this.tagline,
     this.genres,
     this.productionCompanies,
   });

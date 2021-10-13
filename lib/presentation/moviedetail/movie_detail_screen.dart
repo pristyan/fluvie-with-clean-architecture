@@ -8,6 +8,7 @@ import 'package:fluvie/factory/repository_factory.dart';
 import 'package:fluvie/model/base/request_state.dart';
 import 'package:fluvie/model/view/movie.dart';
 import 'package:fluvie/bloc/moviedetail/movie_detail_bloc.dart';
+import 'package:fluvie/presentation/moviedetail/widget/list_item_company.dart';
 import 'package:fluvie/presentation/moviedetail/widget/list_item_genre.dart';
 import 'package:fluvie/resource/assets/local_images_path.dart';
 import 'package:fluvie/resource/styles/dimens.dart';
@@ -134,75 +135,73 @@ class MovieDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, RequestState state) {
-    return AspectRatio(
-      aspectRatio: 3 / 5,
-      child: Builder(
-        builder: (context) {
-          if (state is SuccessState<Movie>) {
-            return Stack(
-              children: [
-                _buildPosterBasedOnState(state),
-                _buildButtonsOnPoster(state.data),
-              ],
-            );
-          } else {
-            return _buildPosterBasedOnState(state);
-          }
-        },
+  Widget _buildHeader(RequestState state) {
+    return SliverToBoxAdapter(
+      child: AspectRatio(
+        aspectRatio: 3 / 5,
+        child: Builder(
+          builder: (context) {
+            if (state is SuccessState<Movie>) {
+              return Stack(
+                children: [
+                  _buildPosterBasedOnState(state),
+                  _buildButtonsOnPoster(state.data),
+                ],
+              );
+            } else {
+              return _buildPosterBasedOnState(state);
+            }
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildTitleAndSummary(RequestState state) {
-    if (state is LoadingState) {
-      return ShimmerContainer(
-        child: Container(
-          margin: const EdgeInsets.only(
-            right: Dimens.spacingLarge,
-            left: Dimens.spacingLarge,
-            top: Dimens.spacingMedium,
-            bottom: Dimens.spacingNormal,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              ShimmerText(height: Dimens.textXLarge),
-              SizedBox(height: Dimens.spacingSmall),
-              ShimmerText(
-                width: 100,
-                height: Dimens.textNormal,
+  Widget _buildTitleAndTagline(RequestState state) {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: Dimens.spacingLarge,
+          vertical: Dimens.spacingMedium,
+        ),
+        child: Builder(builder: (context) {
+          if (state is LoadingState) {
+            return ShimmerContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  ShimmerText(
+                    height: Dimens.textXLarge,
+                    width: double.infinity,
+                  ),
+                  SizedBox(height: Dimens.spacingSmall),
+                  ShimmerText(
+                    height: Dimens.textSmall,
+                    width: 150,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      );
-    } else if (state is SuccessState<Movie>) {
-      return Container(
-        margin: const EdgeInsets.only(
-          right: Dimens.spacingLarge,
-          left: Dimens.spacingLarge,
-          top: Dimens.spacingMedium,
-          bottom: Dimens.spacingNormal,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              state.data.title ?? '',
-              style: TextStyles.header,
-            ),
-            const SizedBox(height: Dimens.spacingSmall),
-            Text(
-              state.data.overview ?? '',
-              style: TextStyles.content,
-            ),
-          ],
-        ),
-      );
-    } else {
-      return const SizedBox();
-    }
+            );
+          } else if (state is SuccessState<Movie>) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  state.data.title ?? '',
+                  style: TextStyles.header,
+                ),
+                Text(
+                  state.data.tagline ?? '',
+                  style: TextStyles.caption,
+                ),
+              ],
+            );
+          } else {
+            return const SizedBox();
+          }
+        }),
+      ),
+    );
   }
 
   Widget _buildGenres(RequestState state) {
@@ -244,6 +243,92 @@ class MovieDetailScreen extends StatelessWidget {
     }
   }
 
+  Widget _buildDescription(RequestState state) {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          vertical: Dimens.spacingMedium,
+          horizontal: Dimens.spacingLarge,
+        ),
+        child: Builder(builder: (context) {
+          if (state is LoadingState) {
+            return ShimmerContainer(
+              child: Column(
+                children: const [
+                  ShimmerText(
+                    width: double.infinity,
+                    height: Dimens.textNormal,
+                  ),
+                  SizedBox(height: Dimens.spacingSmall),
+                  ShimmerText(
+                    width: double.infinity,
+                    height: Dimens.textNormal,
+                  ),
+                  SizedBox(height: Dimens.spacingSmall),
+                  ShimmerText(
+                    width: 150,
+                    height: Dimens.textNormal,
+                  ),
+                ],
+              ),
+            );
+          } else if (state is SuccessState<Movie>) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Overview',
+                  style: TextStyles.sectionHeader,
+                ),
+                const SizedBox(height: Dimens.spacingSmall),
+                Text(
+                  state.data.overview ?? '',
+                  style: TextStyles.content,
+                ),
+              ],
+            );
+          } else {
+            return const SizedBox();
+          }
+        }),
+      ),
+    );
+  }
+
+  Widget _buildCompanySectionHeader() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.only(
+          left: Dimens.spacingLarge,
+        ),
+        child: const Text(
+          'Production Companies',
+          style: TextStyles.sectionHeader,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompanies(RequestState state) {
+    if (state is SuccessState<Movie>) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return ListItemCompany(
+            isLoading: false,
+            company: state.data.productionCompanies?[index],
+          );
+        }, childCount: state.data.productionCompanies?.length ?? 0),
+      );
+    } else {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => const ListItemCompany(isLoading: true),
+          childCount: 3,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -278,16 +363,12 @@ class MovieDetailScreen extends StatelessWidget {
               onRefresh: context.read<MovieDetailBloc>().getDetail,
               child: CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildHeader(context, state),
-                        _buildTitleAndSummary(state),
-                      ],
-                    ),
-                  ),
+                  _buildHeader(state),
+                  _buildTitleAndTagline(state),
                   _buildGenres(state),
+                  _buildDescription(state),
+                  _buildCompanySectionHeader(),
+                  _buildCompanies(state),
                 ],
               ),
             ),
